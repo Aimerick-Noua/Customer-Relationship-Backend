@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -18,11 +19,12 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "user_table",
+@Table(name = "_user",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "phone"),
                 @UniqueConstraint(columnNames = "email")
         })
+
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,9 +34,11 @@ public class User {
     private String firstname;
     private String lastname;
     private String email;
+    @JsonIgnore
     private String password;
     private String address;
     private String phone;
+    @JsonIgnore
     private String profilePicture;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -43,8 +47,20 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    public User(String firstname, String lastname, String phone, String address,String email, String password) {
+    @OneToMany(mappedBy = "user")
+    private List<Command> commands;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Note> notes;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Task> tasks;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Services> services;
+
+    private LocalDate joinedDate;
+    public User(String firstname, String lastname, String phone, String address,String email, String password) {
         this.firstname = firstname;
         this.lastname =lastname;
         this.phone = phone;
@@ -52,12 +68,9 @@ public class User {
         this.email = email;
         this.username =email;
         this.password = password;
-
     }
 
 
 
-    public LocalDate getUpdate() {
-        return LocalDate.now();
-    }
+
 }

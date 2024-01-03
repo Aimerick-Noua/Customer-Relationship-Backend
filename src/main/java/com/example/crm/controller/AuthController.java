@@ -12,7 +12,6 @@ import com.example.crm.repository.RoleRepository;
 import com.example.crm.repository.UserRepository;
 import com.example.crm.security.jwt.JwtUtils;
 import com.example.crm.security.service.UserDetailsImpl;
-import com.example.crm.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,7 +39,6 @@ public class AuthController {
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
-    private final UserService userService;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -111,6 +110,7 @@ public class AuthController {
             }
 
             user.setRoles(roles);
+            user.setJoinedDate(LocalDate.now());
             userRepository.save(user);
 
             return ResponseEntity.ok(new MessageResponse("User registered successfully!"));

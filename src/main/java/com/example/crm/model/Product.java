@@ -1,9 +1,6 @@
 package com.example.crm.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,4 +19,8 @@ public class Product {
     private String description;
     private float price;
     private int quantity;
+
+    @ManyToOne
+    @JoinColumn(name = "command_id") // name of the foreign key column in the product table
+    private Command command;
 }
