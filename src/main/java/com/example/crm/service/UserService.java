@@ -33,7 +33,7 @@ public class UserService {
                 roleRepository.save(adminRole);
 
                 Role employeeRole = new Role();
-                employeeRole.setName(ERole.ROLE_Employee);
+                employeeRole.setName(ERole.ROLE_EMPLOYEE);
                 roleRepository.save(employeeRole);
 
                 Role userRole = new Role();
@@ -95,7 +95,13 @@ public class UserService {
     }
 
 
+public List<User> getAllEmployees(){
 
+    List<User> employees =  userRepository.findByRoles(ERole.ROLE_EMPLOYEE);
+    return employees.stream()
+            .map(this::mapToClientDto)
+            .collect(Collectors.toList());
+}
     public List<User> getAllClientsWithCommandsAndProducts() {
         List<User> clients =  userRepository.findByRoles(ERole.ROLE_USER);
         return clients.stream()

@@ -59,6 +59,10 @@ private final UserService userService;
     public List<User> getAllClientsWithCommandsAndProducts(){
         return userService.getAllClientsWithCommandsAndProducts();
     }
+    @GetMapping("/employees")
+    public List<User> getAllEmployees(){
+        return userService.getAllEmployees();
+    }
 
     @PostMapping("/clients/{id}")
     public void addCommandsByClientsId(@PathVariable Long id,@RequestBody Command command){
