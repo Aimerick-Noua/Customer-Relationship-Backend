@@ -91,19 +91,19 @@ public class AuthController {
                     switch (role) {
                         case "ROLE_ADMIN":
                             Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                                    .orElseThrow(() -> new RuntimeException("Error: Admin Role is not found."));
                             roles.add(adminRole);
 
                             break;
                         case "ROLE_EMPLOYEE":
                             Role modRole = roleRepository.findByName(ERole.ROLE_EMPLOYEE)
-                                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                                    .orElseThrow(() -> new RuntimeException("Error: Employee Role is not found."));
                             roles.add(modRole);
 
                             break;
                         default:
                             Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                                    .orElseThrow(() -> new RuntimeException("Error: User Role is not found."));
                             roles.add(userRole);
                     }
                 });
@@ -115,6 +115,7 @@ public class AuthController {
 
             return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
         } catch (Exception e) {
+            System.out.println(e);
             throw new RuntimeException("failed to create user");
         }
     }

@@ -117,6 +117,7 @@ public List<User> getAllEmployees(){
         clientDto.setPhone(client.getPhone());
         clientDto.setRoles(client.getRoles());
         clientDto.setAddress(client.getAddress());
+        clientDto.setJoinedDate(client.getJoinedDate());
         List<Command> commandDtos = client.getCommands().stream()
                 .map(this::mapToCommandDto)
                 .collect(Collectors.toList());
