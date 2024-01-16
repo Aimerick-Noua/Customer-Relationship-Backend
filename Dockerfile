@@ -8,5 +8,5 @@ RUN mvn clean package
 FROM openjdk:17-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar /app/app.jar
-EXPOSE 8082  # Adjust the port based on your Spring Boot application configuration
+EXPOSE 8080  # Adjust the port based on your Spring Boot application configuration
 ENTRYPOINT ["java", "-jar", "app.jar"]
