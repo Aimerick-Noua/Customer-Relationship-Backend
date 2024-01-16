@@ -1,26 +1,12 @@
-# Maven Build Stage
+# Stage 1: Build the application
 FROM maven:3.8.4-openjdk-17 AS build
-
-# Set the working directory in the container
 WORKDIR /app
-
-# Copy the local project directory into the container
-COPY ./app/ /app/
-
-# Run Maven build
+COPY ./ /app/
 RUN mvn clean package
 
-# Java Image Stage
+# Stage 2: Create the final image with only the JAR file
 FROM openjdk:17-alpine
-
-# Set the working directory in the container
 WORKDIR /app
-
-# Copy the JAR file from the build stage to the new image
 COPY --from=build /app/target/*.jar /app/app.jar
-
-# Expose the port
-EXPOSE 8082
-
-# Command to run the application
+EXPOSE 8082  # Adjust the port based on your Spring Boot application configuration
 ENTRYPOINT ["java", "-jar", "app.jar"]
