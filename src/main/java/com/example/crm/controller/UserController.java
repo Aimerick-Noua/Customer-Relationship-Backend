@@ -34,6 +34,10 @@ private final UserService userService;
     public User getUserById(@PathVariable Long userId){
         return userService.getUserByIdWithCommandsAndProducts(userId);
     }
+    @GetMapping("/clients/{userId}")
+    public User getClientsById(@PathVariable Long userId){
+        return userService.getUserByIdWithCommandsAndProducts(userId);
+    }
 
     @PutMapping("/{userId}")
 

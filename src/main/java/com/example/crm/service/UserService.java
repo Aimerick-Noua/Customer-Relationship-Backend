@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -167,6 +168,7 @@ public List<User> getAllEmployees(){
             command.setUser(user);
             command.setTotalAmount(calculateTotalAmount);
             command.setStatus(Status.PENDING);
+            command.setDateCommand(LocalDate.now());
             commandRepository.save(command);
         } else {
             throw new RuntimeException("User with id " + clientId + " is not a client");
