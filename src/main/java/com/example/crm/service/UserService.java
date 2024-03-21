@@ -1,6 +1,7 @@
 package com.example.crm.service;
 
 import com.example.crm.model.*;
+import com.example.crm.payload.Request.UserInformation;
 import com.example.crm.payload.Request.UserRequest;
 import com.example.crm.repository.CommandRepository;
 import com.example.crm.repository.RoleRepository;
@@ -8,13 +9,18 @@ import com.example.crm.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,8 +30,8 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final ProductService productService;
     private final CommandRepository commandRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final ImageService imageService;
+    private final PasswordEncoder passwordEncoder;
         public void initRoleAndUser(){
 
             if (!roleRepository.existsByName((ERole.ROLE_ADMIN))) {
@@ -81,19 +87,6 @@ public class UserService {
             userRepository.deleteById(id);
     }
 
-    public User updateUser(Long userId, UserRequest userRequest) {
-        User user = userRepository.findById(userId).orElse(null);
-
-        if (user != null) {
-            user.setFirstname(userRequest.getFirstname());
-            user.setLastname(userRequest.getLastname());
-            user.setAddress(userRequest.getAddress());
-            user.setPhone(userRequest.getPhone());
-            return userRepository.save(user);
-        }
-
-        return null;
-    }
 
 
 public List<User> getAllEmployees(){
@@ -173,6 +166,38 @@ public List<User> getAllEmployees(){
         } else {
             throw new RuntimeException("User with id " + clientId + " is not a client");
         }
+    }
+
+    public User updateUser(Long userId, String firstname, String lastname, String phone, String address, MultipartFile profilePicture) {
+        User existingUser = userRepository.findById(userId).orElse(null);
+
+        if (existingUser != null) {
+            existingUser.setFirstname(firstname);
+            existingUser.setLastname(lastname);
+            existingUser.setAddress(address);
+            existingUser.setPhone(phone);
+
+            // Profile image processing
+            if (profilePicture != null && !profilePicture.isEmpty()) {
+                try {
+                    ImageModel newProfileImage = imageService.storeProfileImage(profilePicture);
+                    existingUser.setProfilePicture(newProfileImage);
+
+                    // Delete existing profile image if one exists (optional)
+                    if (existingUser.getProfilePicture() != null) {
+                        imageService.deleteImage(existingUser.getProfilePicture().getId());
+                    }
+                } catch (IOException e) {
+                    // Handle potential IO exceptions during image processing
+                    e.printStackTrace();
+                    throw new RuntimeException("Error saving profile image: " + e.getMessage());
+                }
+            }
+
+            return userRepository.save(existingUser);
+        }
+
+        return null;
     }
 
 }

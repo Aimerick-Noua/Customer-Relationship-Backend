@@ -36,6 +36,10 @@ digitalBox:
     jwtSecret: '4B6150645367566B59703373367639792442264529482B4D6251655468576D5A'
     jwtExpirationMs: 86400000
 
+profile:
+  image:
+    upload:
+      dir: D:/Projects/CRM Application/CRM BackEnd/src/main/resources/profilePictures
 
 server:
   port: 8082

@@ -2,14 +2,18 @@ package com.example.crm.controller;
 
 import com.example.crm.model.Command;
 import com.example.crm.model.User;
+import com.example.crm.payload.Request.UserInformation;
 import com.example.crm.payload.Request.UserRequest;
 import com.example.crm.service.UserService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -39,20 +43,16 @@ private final UserService userService;
         return userService.getUserByIdWithCommandsAndProducts(userId);
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping(path = "/{userId}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public User updateUserProfile( @PathVariable Long userId,
+                                   @RequestPart("firstname") String firstname,
+                                   @RequestPart("lastname") String lastname,
+                                   @RequestPart("phone") String phone,
+                                   @RequestPart("address") String address,
+                                  @RequestPart(value="profilePicture", required = false) MultipartFile profilePicture) throws IOException {
 
-    public ResponseEntity<User> updateUser(
-            @PathVariable Long userId,
-            @RequestBody UserRequest userRequest
-//            @RequestParam(required = false) MultipartFile profilePicture
-    ) {
-        User updatedUser = userService.updateUser(userId,userRequest);
-
-        if (updatedUser != null) {
-            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        User updatedUser = userService.updateUser(userId, firstname,lastname,phone,address, profilePicture);
+    return  updatedUser;
     }
     @DeleteMapping("/{userId}")
     public void deleteUser(@PathVariable Long userId){

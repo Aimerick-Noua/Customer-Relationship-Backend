@@ -38,9 +38,9 @@ public class User {
     private String password;
     private String address;
     private String phone;
-    @JsonIgnore
-    private String profilePicture;
-
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER) // Ensure profile image is retrieved eagerly
+    @JoinColumn(name = "profile_image_id")
+    private ImageModel profilePicture;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
