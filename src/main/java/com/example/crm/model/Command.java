@@ -21,7 +21,7 @@ public class Command {
     private Status status;
     private float totalAmount;
     private LocalDate dateCommand;
-    @ManyToOne // Many commands can be associated with one user
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
     @OneToMany

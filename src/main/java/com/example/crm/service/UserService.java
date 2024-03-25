@@ -1,26 +1,21 @@
 package com.example.crm.service;
 
 import com.example.crm.model.*;
-import com.example.crm.payload.Request.UserInformation;
-import com.example.crm.payload.Request.UserRequest;
 import com.example.crm.repository.CommandRepository;
 import com.example.crm.repository.RoleRepository;
 import com.example.crm.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,6 +91,10 @@ public List<User> getAllEmployees(){
             .map(this::mapToClientDto)
             .collect(Collectors.toList());
 }
+
+
+
+
     public List<User> getAllClientsWithCommandsAndProducts() {
         List<User> clients =  userRepository.findByRoles(ERole.ROLE_USER);
         return clients.stream()
@@ -141,7 +140,6 @@ public List<User> getAllEmployees(){
         return productDto;
     }
 
-    // Inside the ClientService class
     @Transactional
     public void saveCommandWithProducts(Long clientId, Command command) {
         List<User> userList = userRepository.findByRoles(ERole.ROLE_USER);
@@ -200,4 +198,20 @@ public List<User> getAllEmployees(){
         return null;
     }
 
+    public void addTasksToUser(Long userId, List<Task> tasks) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        user.getTasks().addAll(tasks);
+        userRepository.save(user);
+    }
+
+    // Method to add a single task to a specific user by user ID
+    public void addTaskToUser(Long userId, Task task) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        task.setStatus(TaskStatus.NOT_STARTED);
+        task.setSent_date(LocalDate.now());
+        task.setUser(user);
+        addTasksToUser(userId, Collections.singletonList(task));
+    }
 }
