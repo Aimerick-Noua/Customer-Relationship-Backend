@@ -37,6 +37,14 @@ public class TaskController {
         userService.addTaskToUser(id, tasks);
         return ResponseEntity.status(HttpStatus.CREATED).body("Tasks added to user successfully.");
     }
+    @PutMapping("/task/{id}")
+    public Task updateTask(@PathVariable Long id,@RequestBody Task task){
+        return taskService.updateTask(id,task);
+    }
+    @GetMapping("/task/{id}")
+    public Task getTaskById(@PathVariable Long id){
+        return taskService.getTaskById(id);
+    }
     @DeleteMapping("/{taskId}")
     public void deleteTask(@PathVariable Long taskId){
         taskService.deleteTask(taskId);

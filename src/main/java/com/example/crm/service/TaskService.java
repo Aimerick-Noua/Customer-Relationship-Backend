@@ -48,4 +48,18 @@ public class TaskService {
     public void deleteTask(Long taskId) {
         taskRepository.deleteById(taskId);
     }
+
+    public Task updateTask(Long id, Task task) {
+        Task task1 = taskRepository.findById(id).orElseThrow(()->new RuntimeException("task with not found with id "+id));
+        if(task1 !=null) {
+            task1.setStatus(task.getStatus());
+            return taskRepository.save(task1);
+        }
+        return null;
+
+    }
+
+    public Task getTaskById(Long id) {
+        return taskRepository.findById(id).orElseThrow(()->new RuntimeException("task not found with id "+id));
+    }
 }
