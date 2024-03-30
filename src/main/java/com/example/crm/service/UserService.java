@@ -4,7 +4,6 @@ import com.example.crm.model.*;
 import com.example.crm.repository.CommandRepository;
 import com.example.crm.repository.RoleRepository;
 import com.example.crm.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,9 +22,8 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final ProductService productService;
-    private final CommandRepository commandRepository;
     private final ImageService imageService;
+    private final CommandRepository commandRepository;
     private final PasswordEncoder passwordEncoder;
         public void initRoleAndUser(){
 
@@ -57,24 +55,12 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return users.stream()
-                .map(this::mapToClientDto)
-                .collect(Collectors.toList());
+        return  userRepository.findAll();
     }
 
 
-    public User getUserByIdWithCommandsAndProducts(Long id) {
-        return userRepository.findById(id)
-                .map(this::mapToClientDtoForUserId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-    }
-    public User mapToClientDtoForUserId(User client) {
-        List<Command> commandDtos = client.getCommands().stream()
-                .map(this::mapToCommandDto)
-                .collect(Collectors.toList());
-        client.setCommands(commandDtos);
-        return client;
+    public User getClientById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
 
@@ -85,86 +71,20 @@ public class UserService {
 
 
 public List<User> getAllEmployees(){
-
-    List<User> employees =  userRepository.findByRoles(ERole.ROLE_EMPLOYEE);
-    return employees.stream()
-            .map(this::mapToClientDto)
-            .collect(Collectors.toList());
+   List<User> user = userRepository.findByRoles(ERole.ROLE_EMPLOYEE);
+   return user;
 }
 
 
 
 
-    public List<User> getAllClientsWithCommandsAndProducts() {
-        List<User> clients =  userRepository.findByRoles(ERole.ROLE_USER);
+    public List<User> getAllClientsWithCommands() {
+        List<User> clients = userRepository.findByRoles(ERole.ROLE_USER);
         return clients.stream()
-                .map(this::mapToClientDto)
+                .filter(client -> !client.getCommands().isEmpty())
                 .collect(Collectors.toList());
     }
-    private User mapToClientDto(User client) {
-        User clientDto = new User();
-        clientDto.setId(client.getId());
-        clientDto.setFirstname(client.getFirstname());
-        clientDto.setLastname(client.getLastname());
-        clientDto.setEmail(client.getEmail());
-        clientDto.setPhone(client.getPhone());
-        clientDto.setRoles(client.getRoles());
-        clientDto.setAddress(client.getAddress());
-        clientDto.setJoinedDate(client.getJoinedDate());
-        List<Command> commandDtos = client.getCommands().stream()
-                .map(this::mapToCommandDto)
-                .collect(Collectors.toList());
-        clientDto.setCommands(commandDtos);
-        return clientDto;
-    }
-    private Command mapToCommandDto(Command command) {
-        Command commandDto = new Command();
-        commandDto.setId(command.getId());
-        commandDto.setStatus(command.getStatus());
-        commandDto.setTotalAmount(command.getTotalAmount());
-        commandDto.setDateCommand(command.getDateCommand());
-        List<Product> productDtos = command.getProducts().stream()
-                .map(this::mapToProductDto)
-                .collect(Collectors.toList());
-        commandDto.setProducts(productDtos);
-        return commandDto;
-    }
 
-    private Product mapToProductDto(Product product) {
-        Product productDto = new Product();
-        productDto.setId(product.getId());
-        productDto.setName(product.getName());
-        productDto.setDescription(product.getDescription());
-        productDto.setPrice(product.getPrice());
-        productDto.setQuantity(product.getQuantity());
-        return productDto;
-    }
-
-    @Transactional
-    public void saveCommandWithProducts(Long clientId, Command command) {
-        List<User> userList = userRepository.findByRoles(ERole.ROLE_USER);
-        User user = userList.stream()
-                .filter(usr -> usr.getId().equals(clientId))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Client not found with id: " + clientId));
-
-        if (user != null ){
-             float calculateTotalAmount =0.00f;
-            List<Product> products = command.getProducts();
-            for (Product product : products) {
-                calculateTotalAmount+=product.getPrice();
-                product.setCommand(command);
-                productService.addProduct(product);
-            }
-            command.setUser(user);
-            command.setTotalAmount(calculateTotalAmount);
-            command.setStatus(Status.PENDING);
-            command.setDateCommand(LocalDate.now());
-            commandRepository.save(command);
-        } else {
-            throw new RuntimeException("User with id " + clientId + " is not a client");
-        }
-    }
 
     public User updateUser(Long userId, String firstname, String lastname, String phone, String address, MultipartFile profilePicture) {
         User existingUser = userRepository.findById(userId).orElse(null);
@@ -213,5 +133,26 @@ public List<User> getAllEmployees(){
         task.setSent_date(LocalDate.now());
         task.setUser(user);
         addTasksToUser(userId, Collections.singletonList(task));
+    }
+    public void addCommandToUser(Long userId, List<Command> commands) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        user.getCommands().addAll(commands);
+        userRepository.save(user);
+    }
+
+    // Method to add a single task to a specific user by user ID
+    public void addCommandsByClientsId(Long userId,Command command) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        command.setStatus(Status.PENDING);
+        command.setDateCommand(LocalDate.now());
+        command.setAddress(command.getAddress());
+        command.setDescription(command.getDescription());
+        command.setPhone(command.getPhone());
+        command.setTitle(command.getTitle());
+        command.setUser(user);
+        commandRepository.save(command);
+        addCommandToUser(userId, Collections.singletonList(command));
     }
 }

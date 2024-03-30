@@ -1,5 +1,6 @@
 package com.example.crm.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,13 +18,16 @@ import java.util.List;
 public class Command {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Long id;
     private Status status;
-    private float totalAmount;
     private LocalDate dateCommand;
-    @ManyToOne
+    private String title;
+    private String description;
+    private  String email;
+    private String phone;
+    private String address;
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
-    @OneToMany
-    private List<Product> products;
 }

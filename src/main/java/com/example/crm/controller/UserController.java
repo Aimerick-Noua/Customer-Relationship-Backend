@@ -36,11 +36,11 @@ private final UserService userService;
 
     @GetMapping("/{userId}")
     public User getUserById(@PathVariable Long userId){
-        return userService.getUserByIdWithCommandsAndProducts(userId);
+        return userService.getClientById(userId);
     }
     @GetMapping("/clients/{userId}")
     public User getClientsById(@PathVariable Long userId){
-        return userService.getUserByIdWithCommandsAndProducts(userId);
+        return userService.getClientById(userId);
     }
 
     @PutMapping(path = "/{userId}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
@@ -60,8 +60,8 @@ private final UserService userService;
     }
 
     @GetMapping("/clients")
-    public List<User> getAllClientsWithCommandsAndProducts(){
-        return userService.getAllClientsWithCommandsAndProducts();
+    public List<User> getAllClientsWithCommands(){
+        return userService.getAllClientsWithCommands();
     }
     @GetMapping("/employees")
     public List<User> getAllEmployees(){
@@ -70,6 +70,6 @@ private final UserService userService;
 
     @PostMapping("/clients/{id}")
     public void addCommandsByClientsId(@PathVariable Long id,@RequestBody Command command){
-        userService.saveCommandWithProducts(id,command);
+        userService.addCommandsByClientsId(id,command);
     }
 }

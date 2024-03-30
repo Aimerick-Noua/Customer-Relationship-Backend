@@ -49,13 +49,13 @@ public class User {
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Command> commands;
+    private List<Command> commands=new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Note> notes;
 
-    @OneToMany(cascade = CascadeType.ALL) // OneToMany with cascade persist
-    private List<Task> tasks = new ArrayList<>(); // Initialize empty list
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Task> tasks = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Services> services;
@@ -71,10 +71,4 @@ public class User {
         this.password = password;
     }
 
-    public void addTasks(List<Task> tasks) {
-        this.tasks.addAll(tasks);  // Add all tasks to the user's task list
-        for (Task task : tasks) {
-            task.setUser(this); // Set the user for each task in the list (optional, depending on logic)
-        }
-    }
 }
