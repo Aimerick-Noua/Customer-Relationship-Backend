@@ -63,7 +63,7 @@ public class UserService {
                 userRoles.add(userRole);
                 user1.setRoles(userRoles);
                 user1.setJoinedDate(LocalDate.of(2023,7,22));
-                userRepository.save(admin);
+                userRepository.save(user1);
             }
     }
 
@@ -93,9 +93,7 @@ public List<User> getAllEmployees(){
 
     public List<User> getAllClientsWithCommands() {
         List<User> clients = userRepository.findByRoles(ERole.ROLE_USER);
-        return clients.stream()
-                .filter(client -> !client.getCommands().isEmpty())
-                .collect(Collectors.toList());
+        return clients;
     }
 
 
