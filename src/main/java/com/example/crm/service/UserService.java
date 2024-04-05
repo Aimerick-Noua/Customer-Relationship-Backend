@@ -1,5 +1,6 @@
 package com.example.crm.service;
 
+import com.example.crm.exceptions.UserNotFoundException;
 import com.example.crm.model.*;
 import com.example.crm.repository.CommandRepository;
 import com.example.crm.repository.RoleRepository;
@@ -51,6 +52,18 @@ public class UserService {
                 adminRoles.add(adminRole);
                 admin.setRoles(adminRoles);
                 userRepository.save(admin);
+
+                User user1 = new User();
+                user1.setPassword(passwordEncoder.encode("00000000"));
+                user1.setFirstname("Francis");
+                user1.setLastname("Ngannou");
+                user1.setEmail("francis@gmail.com");
+                user1.setUsername("francis@gmail.com");
+                Set<Role> userRoles = new HashSet<>();
+                userRoles.add(userRole);
+                user1.setRoles(userRoles);
+                user1.setJoinedDate(LocalDate.of(2023,7,22));
+                userRepository.save(admin);
             }
     }
 
@@ -60,7 +73,7 @@ public class UserService {
 
 
     public User getClientById(Long id) {
-        return userRepository.findById(id).orElse(null);
+        return userRepository.findById(id).orElseThrow(()->new UserNotFoundException("User not found"));
     }
 
 
