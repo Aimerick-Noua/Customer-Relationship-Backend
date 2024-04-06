@@ -63,6 +63,10 @@ private final UserService userService;
     public List<User> getAllClientsWithCommands(){
         return userService.getAllClientsWithCommands();
     }
+    @GetMapping("/clients/commands")
+    public List<Command> getAllCommands(){
+        return  userService.getAllCommands();
+    }
     @GetMapping("/employees")
     public List<User> getAllEmployees(){
         return userService.getAllEmployees();

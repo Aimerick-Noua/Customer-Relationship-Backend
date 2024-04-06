@@ -166,4 +166,8 @@ public List<User> getAllEmployees(){
         commandRepository.save(command);
         addCommandToUser(userId, Collections.singletonList(command));
     }
+
+    public List<Command> getAllCommands() {
+            return commandRepository.findAll();
+    }
 }
